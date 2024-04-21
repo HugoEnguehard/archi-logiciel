@@ -1,3 +1,4 @@
+using GestionHotel.Apis.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GestionHotel.Apis.Endpoints.Booking;
@@ -23,8 +24,17 @@ public interface SampleInjectionInterface
 
 public class SampleInjectionImplementation : SampleInjectionInterface
 {
+    public ApiContext _context;
+    public SampleInjectionImplementation (ApiContext context)
+    {
+        _context = context;
+    }
     public void DoSomething()
     {
-        Console.WriteLine("Do something");
+        var room = _context.Rooms
+            .FirstOrDefault(r => r.Type == "Single");
+
+        if (room != null) Console.WriteLine("Room found : " + room.Name);
+        else Console.WriteLine("Aucune chambre de type Single n'a été trouvée");
     }
 }

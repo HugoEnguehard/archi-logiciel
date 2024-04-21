@@ -1,5 +1,6 @@
 using GestionHotel.Apis;
 using GestionHotel.Apis.Endpoints.Booking;
+using GestionHotel.Apis.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<SampleInjectionInterface, SampleInjectionImplementation>();
+builder.Services.AddScoped<ApiContext,  ApiContext>();
 
 var app = builder.Build();
 
