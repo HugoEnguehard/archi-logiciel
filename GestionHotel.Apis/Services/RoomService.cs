@@ -1,49 +1,92 @@
-﻿using GestionHotel.Apis.Models;
+﻿using GestionHotel.Apis.Enumerations;
+using GestionHotel.Apis.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace GestionHotel.Apis.Services
+namespace GestionHotel.Apis.Services;
+
+public class RoomService : IRoomService
 {
-    public class RoomService : IRoomService
+    private readonly ApiContext _context;
+
+    public RoomService(ApiContext context)
     {
-        private readonly ApiContext _context;
+        _context = context;
+    }
 
-        public RoomService(ApiContext context)
+    public async Task<bool> AddRoom(Room room)
+    {
+        try
         {
-            _context = context;
+            _context.Rooms.Add(room);
+            await _context.SaveChangesAsync();
+            return true;
         }
-
-        public async Task<bool> AddRoom(Room room)
+        catch (Exception)
         {
-            try
-            {
-                _context.Rooms.Add(room);
-                await _context.SaveChangesAsync();
-                return true;
-            } 
-            catch (Exception ex)
-            {
+            return false;
+        }
+    }
+
+    public async Task<bool> DeleteRoom(int id)
+    {
+        try
+        {
+            var room = await _context.Rooms.FindAsync(id);
+            if (room == null)
                 return false;
-            }
-            
-        }
 
-        public Task<bool> DeleteRoom(int id)
-        {
-            throw new NotImplementedException();
+            _context.Rooms.Remove(room);
+            await _context.SaveChangesAsync();
+            return true;
         }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
 
-        public Task<bool> GetRoomByDates(DateTime start_date, DateTime end_date)
+    public async Task<List<Room>?> GetRoomsToClean()
+    {
+        try
         {
-            throw new NotImplementedException();
+            return await _context.Rooms.Where(r => r.Cleaned == RoomCleaned.NotCleaned.ToString()).ToListAsync();
         }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
 
-        public Task<Room> GetRoomById(int id)
+    public async Task<bool> UpdateRoom(Room room)
+    {
+        try
         {
-            throw new NotImplementedException();
+            _context.Rooms.Update(room);
+            await _context.SaveChangesAsync();
+            return true;
         }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
 
-        public Task<Room> UpdateRoom(Room room)
+    public async Task<Room?> GetRoomById(int id)
+    {
+        try
         {
-            throw new NotImplementedException();
+            return await _context.Rooms.FindAsync(id);
         }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    public Task<List<Room>?> GetDisponibleRoomsByDates(DateTime start_date, DateTime end_date)
+    {
+        return null;
+
+        throw new NotImplementedException();
     }
 }
