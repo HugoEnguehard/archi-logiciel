@@ -48,19 +48,20 @@ namespace GestionHotel.Apis.Services
             }
         }
 
-        public Task<Reservation> GetReservationByDates(DateTime start_date, DateTime end_date)
+        public async Task<Reservation>? GetReservationByDates(DateTime start_date, DateTime end_date)
         {
             try
             {
-                var reservations = await _context.Reservations
-                    .Where(r => r.ReservationDate >= startDate && r.ReservationDate <= endDate)
-                    .ToListAsync();
+                //var reservations = await _context.Reservations
+                //    .Where(r => r.ReservationDate >= startDate && r.ReservationDate <= endDate)
+                //    .ToListAsync();
 
-                return reservations;
+                //return reservations;
+                return null;
             }
             catch
             {
-                return new List<Reservation>();
+                return null;
             }
         }
 
