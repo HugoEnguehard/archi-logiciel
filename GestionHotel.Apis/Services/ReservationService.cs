@@ -102,5 +102,24 @@ namespace GestionHotel.Apis.Services
                 return false;
             }
         }
+
+        public async Task<Reservation?> GetCurrentReservationFromRoomId(int roomId)
+        {
+            try
+            {
+                var currentDate = DateOnly.FromDateTime(DateTime.Today);
+
+                var reservation = await _context.Reservations
+                    .FirstOrDefaultAsync(r => r.RoomId == roomId &&
+                                              r.StartDate <= currentDate &&
+                                              r.EndDate >= currentDate);
+
+                return reservation;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
     }
 }

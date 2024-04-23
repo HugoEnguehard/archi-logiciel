@@ -29,12 +29,14 @@ public partial class ApiContext : DbContext
     {
         modelBuilder.Entity<Reservation>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__reservat__3214EC07BC142109");
+            entity.HasKey(e => e.Id).HasName("PK__tmp_ms_x__3214EC07F30E8806");
 
             entity.ToTable("reservation");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.EndDate).HasColumnName("End_Date");
+            entity.Property(e => e.Paid)
+                .HasMaxLength(15)
+                .IsUnicode(false);
             entity.Property(e => e.RoomId).HasColumnName("Room_Id");
             entity.Property(e => e.StartDate).HasColumnName("Start_Date");
             entity.Property(e => e.TotalPrice).HasColumnName("Total_Price");
@@ -43,13 +45,12 @@ public partial class ApiContext : DbContext
 
         modelBuilder.Entity<Room>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__room__3214EC078E03C551");
+            entity.HasKey(e => e.Id).HasName("PK__tmp_ms_x__3214EC07F5FFD3A2");
 
             entity.ToTable("room");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Cleaned)
-                .HasMaxLength(5)
+                .HasMaxLength(15)
                 .IsUnicode(false);
             entity.Property(e => e.Description)
                 .HasMaxLength(255)
@@ -58,6 +59,9 @@ public partial class ApiContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false);
             entity.Property(e => e.NbPeople).HasColumnName("Nb_People");
+            entity.Property(e => e.Occupied)
+                .HasMaxLength(15)
+                .IsUnicode(false);
             entity.Property(e => e.State)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -68,11 +72,10 @@ public partial class ApiContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__user__3214EC0730C269DD");
+            entity.HasKey(e => e.Id).HasName("PK__tmp_ms_x__3214EC07CE5C9DF5");
 
             entity.ToTable("user");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Firstname)
                 .HasMaxLength(255)
                 .IsUnicode(false);

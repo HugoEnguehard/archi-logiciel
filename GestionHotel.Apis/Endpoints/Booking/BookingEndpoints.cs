@@ -12,7 +12,7 @@ public static class BookingEndpoints
             .WithOpenApi()
             .WithTags("Room");
 
-        group.MapPost("arrive/", BookingHandler.ClientArrive)
+        group.MapPost("arrive/", BookingHandler.ClientArrivalDepart)
             .WithName("Arrive");
         group.MapGet("", BookingHandler.GetAvailableRooms)
             .WithName("GetAvailableRooms");

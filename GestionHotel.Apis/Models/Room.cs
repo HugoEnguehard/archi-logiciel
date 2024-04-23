@@ -20,4 +20,6 @@ public partial class Room
     public int? NbPeople { get; set; }
 
     public string? Cleaned { get; set; }
+
+    public string? Occupied { get; set; }
 }

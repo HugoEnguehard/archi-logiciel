@@ -1,20 +1,16 @@
 using GestionHotel.Apis.Enumerations;
 using GestionHotel.Apis.Models;
 using GestionHotel.Apis.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
-using GestionHotel.Apis.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GestionHotel.Apis.Endpoints.Booking;
 
 public static class BookingHandler
 {
-    public static Task<bool> ClientArrive(HttpContext context, SampleInjectionInterface sampleInjectionInterface, [FromBody] ClientArriveBodyParams bodyParams, [FromRoute] ClientArriveBodyParams urlParams, )
+    public static Task<string> ClientArrivalDepart(HttpContext context, SampleInjectionInterface sampleInjectionInterface, [FromBody] ClientArriveBodyParams bodyParams, int userId, bool isDepart)
     {
-        sampleInjectionInterface.clientArrive(urlParams);
-        return Task.FromResult(true);
+        return sampleInjectionInterface.clientArrivalDepartController(bodyParams, userId, isDepart);
     }
-
 }
     public static Task<List<Room>> GetAllAvailableRooms(HttpContext context, SampleInjectionInterface sampleInjectionInterface, string start_date, string end_date)
     {
@@ -42,6 +38,7 @@ public interface SampleInjectionInterface
     Task<string> ReservationRoomByDates(int userId, int roomId, string start_date, string end_date, int card_code);
 
     Task<string> DeleteReservation(int reservationId, bool refoudByReceptionist);
+    Task<string> clientArrivalDepartController(ClientArriveBodyParams bodyParams, int userId, bool isDepart);
 }
 
 public class SampleInjectionImplementation : SampleInjectionInterface
@@ -67,9 +64,41 @@ public class SampleInjectionImplementation : SampleInjectionInterface
         _paiementService = new PaiementService();
     }
 
-    public void clientArrive(ClientArriveBodyParams bodyParams, ClientArriveUrlParams urlParams)
+    public async Task<string> clientArrivalDepartController(ClientArriveBodyParams bodyParams, int userId, bool isDepart)
     {
-        var roomId = bodyParams.roomId;
+        try
+        {
+            if (userId == 0)
+            {
+                throw new ArgumentNullException(nameof(userId), "Missing url param : userId");
+            }
+
+            // We get user from id & check if he is a receptionnist
+            User user = await _userService.GetUserById(userId);
+
+            if (user == null || user.Type != UserType.Receptionist.ToString())
+            {
+                throw new Exception("Unauthorized");
+            }
+
+            // We get the room & check if it exists
+            Room room = await _roomService.GetRoomById(bodyParams.roomId);
+
+            if (room == null)
+            {
+                throw new Exception("Room not found");
+            }
+
+            // We check if the action is a depart or not & update the room
+            if (isDepart)
+            {
+                room.Occupied = RoomOccupied.NotOccupied.ToString();
+                room.Cleaned = RoomCleaned.NotCleaned.ToString();
+            }
+            else
+            {
+                room.Occupied = RoomOccupied.Occupied.ToString();
+            }
 
         var room = _roomService.GetRoomById(roomId);
         if (room != null) Console.WriteLine("Room found : " + room.Name);
@@ -162,6 +191,13 @@ public class SampleInjectionImplementation : SampleInjectionInterface
             throw new Exception("Une erreur s'est produite lors de la réservation");
         }
     }
+            // We get the current reservation for this room & check if it had been paid
+            Reservation currentReservation = await _reservationService.GetCurrentReservationFromRoomId(room.Id);
+
+            if(currentReservation == null)
+            {
+                throw new Exception("Cette chambre ne possède pas de réservation en cour");
+            }
 
     public async Task<string> DeleteReservation(int reservationId, bool refoudByReceptionist)
     {
@@ -215,4 +251,18 @@ public class SampleInjectionImplementation : SampleInjectionInterface
 
 
 
+            if(await _roomService.UpdateRoom(room))
+            {
+                return $"La chambre a été mise à jour. {(currentReservation.Paid == ReservationPaid.Paid.ToString() ? "Le paiement a bien été effectué" : "Attention : Le paiement n'a pas encore eu lieu")}";
+            } 
+            else
+            {
+                return "Une erreur a eu lieu lors de la mise à jour de la chambre";
+            }
+        }
+        catch (Exception ex)
+        {
+            return ex.Message;
+        }
+    }
 }

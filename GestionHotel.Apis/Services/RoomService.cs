@@ -73,11 +73,12 @@ public class RoomService : IRoomService
         }
     }
 
-    public async Task<Room?> GetRoomById(int id)
+    public async Task<Room?> GetRoomById(int Id)
     {
         try
         {
-            return await _context.Rooms.FindAsync(id);
+            var room = await _context.Rooms.FindAsync(Id);
+            return room;
         }
         catch (Exception)
         {
