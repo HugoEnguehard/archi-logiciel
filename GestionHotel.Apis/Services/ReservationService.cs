@@ -26,12 +26,12 @@ namespace GestionHotel.Apis.Services
             
         }
 
-        public Task<bool> DeleteReservation(int id)
+        public async Task<bool> DeleteReservation(int id)
         {
             try
             {
                 var reservation = await _context.Reservations.FindAsync(id);
-                if (reservavtion != null)
+                if (reservation != null)
                 {
                     _context.Reservations.Remove(reservation);
                     await _context.SaveChangesAsync();
@@ -48,12 +48,12 @@ namespace GestionHotel.Apis.Services
             }
         }
 
-        public Task<bool> GetReservationByDates(DateTime start_date, DateTime end_date)
+        public Task<Reservation> GetReservationByDates(DateTime start_date, DateTime end_date)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Reservation> GetReservationById(int id)
+        public async Task<Reservation> GetReservationById(int id)
         {
             try
             {
@@ -74,7 +74,7 @@ namespace GestionHotel.Apis.Services
             }
         }
 
-        public Task<Reservation> UpdateReservation(Reservation reservation)
+        public async Task<bool> UpdateReservation(Reservation reservation)
         {
             try
             {

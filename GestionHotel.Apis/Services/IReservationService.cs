@@ -2,12 +2,12 @@
 
 namespace GestionHotel.Apis.Services
 {
-    private interface IReservationService
+    public interface IReservationService
     {
         Task<bool> AddReservation(Reservation reservation);
-        Task<Room> GetReseravtionById(int id);
-        Task<bool> GetReservationByDates(DateTime start_date, DateTime end_date);
-        Task<Room> UpdateReservation(Reservation reservation);
+        Task<Reservation> GetReseravtionById(int id);
+        Task<Reservation> GetReservationByDates(DateTime start_date, DateTime end_date);
+        Task<bool> UpdateReservation(Reservation reservation);
         Task<bool> DeleteReservation(int id);
     }
 }
