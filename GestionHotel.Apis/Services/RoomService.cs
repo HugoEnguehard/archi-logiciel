@@ -6,11 +6,13 @@ namespace GestionHotel.Apis.Services;
 
 public class RoomService : IRoomService
 {
-    private readonly ApiContext _context;
+    private readonly ApiContext _context; 
+    private readonly ReservationService _reservationService;
 
     public RoomService(ApiContext context)
     {
         _context = context;
+        _reservationService = new ReservationService(_context);
     }
 
     public async Task<bool> AddRoom(Room room)
@@ -83,10 +85,21 @@ public class RoomService : IRoomService
         }
     }
 
-    public Task<List<Room>?> GetDisponibleRoomsByDates(DateTime start_date, DateTime end_date)
+    public async Task<List<Room>?> GetDisponibleRoomsByDates(DateTime start_date, DateTime end_date)
     {
-        return null;
+        try
+        {
+            // Récupérer réservations dans l'interval des dates
+            List<Reservation> reservationList = await _reservationService.GetReservationsByDates(start_date, end_date);
 
-        throw new NotImplementedException();
+            // Récupérer toutes les chambres dont l'id n'est pas dans les réservations
+            List<Room> rooms = _context.Rooms.Where(room => !reservationList.Any(reservation => reservation.RoomId == room.Id)).ToList();
+
+            return rooms;
+        }
+        catch
+        {
+            throw new NotImplementedException();
+        }
     }
 }

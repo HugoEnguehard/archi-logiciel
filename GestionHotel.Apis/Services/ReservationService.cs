@@ -1,4 +1,5 @@
 ﻿using GestionHotel.Apis.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace GestionHotel.Apis.Services
 {
@@ -48,20 +49,22 @@ namespace GestionHotel.Apis.Services
             }
         }
 
-        public async Task<Reservation>? GetReservationByDates(DateTime start_date, DateTime end_date)
+        public async Task<List<Reservation>> GetReservationsByDates(DateTime start_date, DateTime end_date)
         {
             try
             {
-                //var reservations = await _context.Reservations
-                //    .Where(r => r.ReservationDate >= startDate && r.ReservationDate <= endDate)
-                //    .ToListAsync();
+                var startDate = new DateOnly(start_date.Year, start_date.Month, start_date.Day);
+                var endDate = new DateOnly(end_date.Year, end_date.Month, end_date.Day);
 
-                //return reservations;
-                return null;
+                var reservations = await _context.Reservations
+                    .Where(r => r.StartDate >= startDate || r.EndDate <= endDate)
+                    .ToListAsync();
+
+                return reservations;
             }
             catch
             {
-                return null;
+                return new List<Reservation>();
             }
         }
 
