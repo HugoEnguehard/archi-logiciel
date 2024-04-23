@@ -50,7 +50,18 @@ namespace GestionHotel.Apis.Services
 
         public Task<Reservation> GetReservationByDates(DateTime start_date, DateTime end_date)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var reservations = await _context.Reservations
+                    .Where(r => r.ReservationDate >= startDate && r.ReservationDate <= endDate)
+                    .ToListAsync();
+
+                return reservations;
+            }
+            catch
+            {
+                return new List<Reservation>();
+            }
         }
 
         public async Task<Reservation> GetReservationById(int id)
