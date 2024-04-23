@@ -49,7 +49,7 @@ namespace GestionHotel.Apis.Services
             }
         }
 
-        public async Task<List<Reservation>> GetReservationsByDates(DateTime start_date, DateTime end_date)
+        public async Task<List<Reservation>> GetReservationByDates(DateTime start_date, DateTime end_date)
         {
             try
             {

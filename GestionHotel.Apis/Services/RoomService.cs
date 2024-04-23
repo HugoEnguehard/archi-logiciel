@@ -90,7 +90,7 @@ public class RoomService : IRoomService
         try
         {
             // Récupérer réservations dans l'interval des dates
-            List<Reservation> reservationList = await _reservationService.GetReservationsByDates(start_date, end_date);
+            List<Reservation> reservationList = await _reservationService.GetReservationByDates(start_date, end_date);
 
             // Récupérer toutes les chambres dont l'id n'est pas dans les réservations
             List<Room> rooms = _context.Rooms.Where(room => !reservationList.Any(reservation => reservation.RoomId == room.Id)).ToList();
