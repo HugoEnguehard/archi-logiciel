@@ -4,13 +4,16 @@
 public static class BookingEndpoints
 {
     private const string BASE_URL = "/api/v1/booking/";
+    private const string BASE_ROOM_URL = "/api/room/";
 
     public static void MapBookingsEndpoints(this IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup(BASE_URL)
+        var group = routes.MapGroup(BASE_ROOM_URL)
             .WithOpenApi()
-            .WithTags("Booking");
+            .WithTags("Room");
 
+        group.MapPost("arrive/", BookingHandler.ClientArrive)
+            .WithName("Arrive");
         group.MapGet("", BookingHandler.GetAvailableRooms)
             .WithName("GetAvailableRooms");
 

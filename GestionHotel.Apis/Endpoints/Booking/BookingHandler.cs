@@ -1,18 +1,21 @@
 using GestionHotel.Apis.Enumerations;
 using GestionHotel.Apis.Models;
 using GestionHotel.Apis.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
+using GestionHotel.Apis.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GestionHotel.Apis.Endpoints.Booking;
 
 public static class BookingHandler
 {
-    public static Task<BookingView> GetAvailableRooms(HttpContext context, SampleInjectionInterface sampleInjectionInterface, [AsParameters] GetAvailableRoomsInput input)
+    public static Task<bool> ClientArrive(HttpContext context, SampleInjectionInterface sampleInjectionInterface, [FromBody] ClientArriveBodyParams bodyParams, [FromRoute] ClientArriveBodyParams urlParams, )
     {
-        sampleInjectionInterface.DoSomething();
-        return Task.FromResult(new BookingView());
+        sampleInjectionInterface.clientArrive(urlParams);
+        return Task.FromResult(true);
     }
 
+}
     public static Task<List<Room>> GetAllAvailableRooms(HttpContext context, SampleInjectionInterface sampleInjectionInterface, string start_date, string end_date)
     {
         return sampleInjectionInterface.GetAllAvailableRooms(start_date, end_date);
@@ -31,6 +34,7 @@ public static class BookingHandler
 
 public interface SampleInjectionInterface
 {
+    void clientArrive(ClientArriveBodyParams bodyParams, ClientArriveUrlParams urlParams);
     void DoSomething();
 
     Task<List<Room>> GetAllAvailableRooms(string start_date, string end_date);
@@ -46,6 +50,10 @@ public class SampleInjectionImplementation : SampleInjectionInterface
     public RoomService _roomService;
     public UserService _userService;
     public ReservationService _reservationService;
+    public SampleInjectionImplementation(ApiContext context)
+    public RoomService _roomService;
+    public UserService _userService;
+    public ReservationService _reservationService;
     public PaiementService _paiementService;
     public SampleInjectionImplementation(ApiContext context)
     {
@@ -53,13 +61,17 @@ public class SampleInjectionImplementation : SampleInjectionInterface
         _roomService = new RoomService(_context);
         _userService = new UserService(_context);
         _reservationService = new ReservationService(_context);
+        _roomService = new RoomService(_context);
+        _userService = new UserService(_context);
+        _reservationService = new ReservationService(_context);
         _paiementService = new PaiementService();
     }
-    public void DoSomething()
-    {
-        var room = _context.Rooms
-            .FirstOrDefault(r => r.Type == "Single");
 
+    public void clientArrive(ClientArriveBodyParams bodyParams, ClientArriveUrlParams urlParams)
+    {
+        var roomId = bodyParams.roomId;
+
+        var room = _roomService.GetRoomById(roomId);
         if (room != null) Console.WriteLine("Room found : " + room.Name);
         else Console.WriteLine("Aucune chambre de type Single n'a �t� trouv�e");
     }
@@ -200,6 +212,7 @@ public class SampleInjectionImplementation : SampleInjectionInterface
         var year = int.Parse(split_date[2]);
         return new DateOnly(year, month, day);
     }
+
 
 
 }
