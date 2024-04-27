@@ -1,6 +1,6 @@
 ﻿namespace GestionHotel.Apis.Enumerations;
 
-public enum RoomType
+public enum UserType
 {
     Client,
     Receptionist,

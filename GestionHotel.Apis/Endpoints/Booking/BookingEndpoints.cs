@@ -14,7 +14,7 @@ public static class BookingEndpoints
         group.MapGet("", BookingHandler.GetAvailableRooms)
             .WithName("GetAvailableRooms");
 
-        group.MapPost("", BookingHandler.Create)
-            .WithName("CreateBooking");
+        group.MapPost("/getAllAvailableRooms", BookingHandler.GetAllAvailableRooms)
+            .WithName("GetAllAvailableRooms");
     }
 }
