@@ -23,6 +23,11 @@ public static class BookingHandler
         return sampleInjectionInterface.GetAllAvailableRoomsController(start_date, end_date);
     }
 
+    public static Task<List<Room>> GetAllNotCleanedRooms(HttpContext context, SampleInjectionInterface sampleInjectionInterface, int userId)
+    {
+        return sampleInjectionInterface.GetAllNotCleanedRoomsController(userId);
+    }
+
     public static Task<string> ReservationRoomByDates(HttpContext context, SampleInjectionInterface sampleInjectionInterface, int userId, int roomId, string start_date, string end_date, int card_code)
     {
         return sampleInjectionInterface.ReservationRoomByDatesController(userId, roomId, start_date, end_date, card_code);
@@ -37,6 +42,8 @@ public static class BookingHandler
 public interface SampleInjectionInterface
 {
     Task<List<Room>> GetAllAvailableRoomsController(string start_date, string end_date);
+
+    Task<List<Room>> GetAllNotCleanedRoomsController(int userId);
 
     Task<string> ReservationRoomByDatesController(int userId, int roomId, string start_date, string end_date, int card_code);
 
@@ -137,6 +144,30 @@ public class SampleInjectionImplementation : SampleInjectionInterface
 
         List<Room> roomsAvailable = await _roomService.GetDisponibleRoomsByDates(conv_real_start_date_to_dateTime, conv_real_end_date_to_dateTime);
         if(roomsAvailable == null || roomsAvailable.Count == 0){
+            throw new Exception("Aucune chambre de disponible");
+        }
+
+        return roomsAvailable;
+    }
+
+    public async Task<List<Room>> GetAllNotCleanedRoomsController(int userId)
+    {
+        if (userId == 0)
+        {
+            throw new ArgumentNullException(nameof(userId), "Missing url param : userId");
+        }
+
+        // We get user from id & check if he is a receptionnist
+        User user = await _userService.GetUserById(userId);
+
+        if (user == null || user.Type != UserType.Cleaner.ToString())
+        {
+            throw new Exception("Unauthorized");
+        }
+
+        List<Room> roomsAvailable = await _roomService.GetRoomsToClean();
+        if (roomsAvailable == null || roomsAvailable.Count == 0)
+        {
             throw new Exception("Aucune chambre de disponible");
         }
 

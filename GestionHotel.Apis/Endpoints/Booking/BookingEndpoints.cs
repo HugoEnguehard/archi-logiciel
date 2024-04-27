@@ -21,6 +21,9 @@ public static class BookingEndpoints
         group.MapGet("/getAllAvailableRooms", BookingHandler.GetAllAvailableRooms)
             .WithName("ListeChambresDisponibles");
 
+        group.MapGet("/getAllNotCleanedRooms", BookingHandler.GetAllAvailableRooms)
+            .WithName("ListeChambresANettoyer");
+
         group.MapDelete("/deleteReservation", BookingHandler.DeleteReservation)
              .WithName("AnnulerReservation");
         group.MapPost("", BookingHandler.MarkRoomAsCleaned)
