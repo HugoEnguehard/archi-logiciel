@@ -3,7 +3,7 @@
 
 public static class BookingEndpoints
 {
-    private const string BASE_URL = "/api/v1/booking/";
+    //private const string BASE_URL = "/api/v1/booking/";
     private const string BASE_ROOM_URL = "/api/room/";
 
     public static void MapBookingsEndpoints(this IEndpointRouteBuilder routes)
@@ -12,12 +12,16 @@ public static class BookingEndpoints
             .WithOpenApi()
             .WithTags("Room");
 
-        group.MapPost("arrive/", BookingHandler.ClientArrivalDepart)
-            .WithName("Arrive");
-        group.MapGet("", BookingHandler.GetAvailableRooms)
-            .WithName("GetAvailableRooms");
+        group.MapPost("/reserveRoom", BookingHandler.ReservationRoomByDates)
+            .WithName("NouvelleReservation");
 
-        group.MapPost("/getAllAvailableRooms", BookingHandler.GetAllAvailableRooms)
-            .WithName("GetAllAvailableRooms");
+        group.MapPut("/manageArrivalDepart", BookingHandler.ClientArrivalDepart)
+            .WithName("GestionArriveDepartClients");
+
+        group.MapGet("/getAllAvailableRooms", BookingHandler.GetAllAvailableRooms)
+            .WithName("ListeChambresDisponibles");
+
+        group.MapDelete("/deleteReservation", BookingHandler.DeleteReservation)
+             .WithName("AnnulerReservation");
     }
 }

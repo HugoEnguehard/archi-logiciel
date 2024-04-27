@@ -49,7 +49,7 @@ namespace GestionHotel.Apis.Services
             }
         }
 
-        public async Task<List<Reservation>> GetReservationByDates(DateTime start_date, DateTime end_date)
+        public async Task<List<Reservation>> GetReservationsByDates(DateTime start_date, DateTime end_date)
         {
             try
             {
@@ -57,8 +57,13 @@ namespace GestionHotel.Apis.Services
                 var endDate = new DateOnly(end_date.Year, end_date.Month, end_date.Day);
 
                 var reservations = await _context.Reservations
-                    .Where(r => r.StartDate >= startDate || r.EndDate <= endDate)
+                    .Where(r => (r.StartDate >= startDate && r.StartDate <= endDate) || (r.EndDate <= endDate && r.EndDate >= startDate))
                     .ToListAsync();
+
+                foreach (var reservation in reservations)
+                {
+                    Console.WriteLine($"Reservation ID: {reservation.Id}, Room ID: {reservation.RoomId}");
+                }
 
                 return reservations;
             }
