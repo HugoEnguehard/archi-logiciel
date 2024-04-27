@@ -4,5 +4,5 @@ public enum UserType
 {
     Client,
     Receptionist,
-    Cleener
+    Cleaner
 }

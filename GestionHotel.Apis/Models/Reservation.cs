@@ -16,4 +16,6 @@ public partial class Reservation
     public int? RoomId { get; set; }
 
     public double? TotalPrice { get; set; }
+
+    public string? Paid { get; set; }
 }
