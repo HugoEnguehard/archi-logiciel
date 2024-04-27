@@ -18,8 +18,14 @@ public static class BookingEndpoints
         group.MapPut("/manageArrivalDepart", BookingHandler.ClientArrivalDepart)
             .WithName("GestionArriveDepartClients");
 
+        group.MapPut("/markRoomToClean", BookingHandler.MarkRoomAsCleaned)
+            .WithName("ModifierEtatChambreNettoyee");
+
         group.MapGet("/getAllAvailableRooms", BookingHandler.GetAllAvailableRooms)
             .WithName("ListeChambresDisponibles");
+
+        group.MapGet("/getAllNotCleanedRooms", BookingHandler.GetAllAvailableRooms)
+            .WithName("ListeChambresANettoyer");
 
         group.MapDelete("/deleteReservation", BookingHandler.DeleteReservation)
              .WithName("AnnulerReservation");

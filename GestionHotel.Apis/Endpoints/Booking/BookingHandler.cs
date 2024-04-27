@@ -13,10 +13,19 @@ public static class BookingHandler
     {
         return sampleInjectionInterface.ClientArrivalDepartController(bodyParams, userId, isDepart);
     }
+    public static Task<string> MarkRoomAsCleaned(SampleInjectionInterface sampleInjectionInterface, [FromBody] RoomBodyParams bodyParams, int userId)
+    {
+        return sampleInjectionInterface.MarkRoomAsCleanedController(bodyParams, userId);
+    }
 
     public static Task<List<Room>> GetAllAvailableRooms(HttpContext context, SampleInjectionInterface sampleInjectionInterface, string start_date, string end_date)
     {
         return sampleInjectionInterface.GetAllAvailableRoomsController(start_date, end_date);
+    }
+
+    public static Task<List<Room>> GetAllNotCleanedRooms(HttpContext context, SampleInjectionInterface sampleInjectionInterface, int userId)
+    {
+        return sampleInjectionInterface.GetAllNotCleanedRoomsController(userId);
     }
 
     public static Task<string> ReservationRoomByDates(HttpContext context, SampleInjectionInterface sampleInjectionInterface, int userId, int roomId, string start_date, string end_date, int card_code)
@@ -34,11 +43,15 @@ public interface SampleInjectionInterface
 {
     Task<List<Room>> GetAllAvailableRoomsController(string start_date, string end_date);
 
+    Task<List<Room>> GetAllNotCleanedRoomsController(int userId);
+
     Task<string> ReservationRoomByDatesController(int userId, int roomId, string start_date, string end_date, int card_code);
 
     Task<string> DeleteReservationController(int reservationId, bool refoudByReceptionist);
 
     Task<string> ClientArrivalDepartController(ClientArriveBodyParams bodyParams, int userId, bool isDepart);
+
+    Task<string> MarkRoomAsCleanedController(RoomBodyParams bodyParams, int userId);
 }
 
 public class SampleInjectionImplementation : SampleInjectionInterface
@@ -131,6 +144,30 @@ public class SampleInjectionImplementation : SampleInjectionInterface
 
         List<Room> roomsAvailable = await _roomService.GetDisponibleRoomsByDates(conv_real_start_date_to_dateTime, conv_real_end_date_to_dateTime);
         if(roomsAvailable == null || roomsAvailable.Count == 0){
+            throw new Exception("Aucune chambre de disponible");
+        }
+
+        return roomsAvailable;
+    }
+
+    public async Task<List<Room>> GetAllNotCleanedRoomsController(int userId)
+    {
+        if (userId == 0)
+        {
+            throw new ArgumentNullException(nameof(userId), "Missing url param : userId");
+        }
+
+        // We get user from id & check if he is a receptionnist
+        User user = await _userService.GetUserById(userId);
+
+        if (user == null || user.Type != UserType.Cleaner.ToString())
+        {
+            throw new Exception("Unauthorized");
+        }
+
+        List<Room> roomsAvailable = await _roomService.GetRoomsToClean();
+        if (roomsAvailable == null || roomsAvailable.Count == 0)
+        {
             throw new Exception("Aucune chambre de disponible");
         }
 
@@ -280,6 +317,45 @@ public class SampleInjectionImplementation : SampleInjectionInterface
         }
     }
 
+    public async Task<string> MarkRoomAsCleanedController(RoomBodyParams bodyParams, int userId)
+    {
+        try
+        {
+            if (userId == 0)
+            {
+                throw new ArgumentNullException(nameof(userId), "Missing url param : userId");
+            }
+
+            // We get user from id & check if he is a receptionnist
+            User user = await _userService.GetUserById(userId);
+
+            if (user == null || user.Type != UserType.Cleaner.ToString())
+            {
+                throw new Exception("Unauthorized");
+            }
+
+            // We get the room & check if it exists + if it's already cleaned
+            Room room = await _roomService.GetRoomById(bodyParams.roomId);
+
+            if (room == null)
+            {
+                if (room.Cleaned == "Cleaned")
+                {
+                    throw new Exception("Room already cleaned");
+                }
+                throw new Exception("Room not found");
+            }
+
+            //Then we update the target room "Cleaned" status
+            room.Cleaned = "Cleaned";
+            await _context.SaveChangesAsync();
+            return $"La chambre {bodyParams.roomId} a bien été notée comme nettoyée";
+        }
+        catch (Exception ex)
+        {
+            return ex.Message;
+        }
+    }
     // Méthode utilitaire pour convertir une date en objet DateOnly
     private DateOnly ParseDate(string date)
     {
@@ -288,5 +364,6 @@ public class SampleInjectionImplementation : SampleInjectionInterface
         var month = int.Parse(split_date[1]);
         var year = int.Parse(split_date[2]);
         return new DateOnly(year, month, day);
+        
     }
 }
