@@ -23,5 +23,7 @@ public static class BookingEndpoints
 
         group.MapDelete("/deleteReservation", BookingHandler.DeleteReservation)
              .WithName("AnnulerReservation");
+        group.MapPost("", BookingHandler.MarkRoomAsCleaned)
+            .WithName("Clean");
     }
 }
